@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="max_speed_entries">
+        <item>180 km/h</item>
+        <item>200 km/h</item>
+        <item>220 km/h</item>
+        <item>240 km/h</item>
+    </string-array>
+    <string-array name="max_speed_values">
+        <item>180</item>
+        <item>200</item>
+        <item>220</item>
+        <item>240</item>
+    </string-array>
+
+    <string-array name="smoothing_entries">
+        <item>@string/smoothing_low</item>
+        <item>@string/smoothing_medium</item>
+        <item>@string/smoothing_high</item>
+    </string-array>
+    <string-array name="smoothing_values">
+        <item>LOW</item>
+        <item>MEDIUM</item>
+        <item>HIGH</item>
+    </string-array>
+
+    <string-array name="theme_entries">
+        <item>@string/theme_auto</item>
+        <item>@string/theme_light</item>
+        <item>@string/theme_dark</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>AUTO</item>
+        <item>LIGHT</item>
+        <item>DARK</item>
+    </string-array>
+
+    <string-array name="unit_entries">
+        <item>km/h</item>
+        <item>mph</item>
+    </string-array>
+    <string-array name="unit_values">
+        <item>km/h</item>
+        <item>mph</item>
+    </string-array>
+</resources>

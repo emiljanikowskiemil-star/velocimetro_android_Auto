@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Velocímetro GPS</string>
+    <string name="auto_app_name">Velocímetro</string>
+    <string name="title_activity_speedometer">Velocímetro GPS</string>
+    <string name="title_activity_settings">Configurações</string>
+
+    <string name="speedometer_card_title">VELOCÍMETRO GPS</string>
+    <string name="speedometer_card_action">ABRIR VELOCÍMETRO</string>
+    <string name="unit_kmh">km/h</string>
+    <string name="unit_mph">mph</string>
+
+    <string name="pref_category_speedometer">Velocímetro GPS</string>
+    <string name="pref_enable_speedometer">Ativar velocímetro</string>
+    <string name="pref_max_speed">Velocidade máxima</string>
+    <string name="pref_smoothing">Suavização GPS</string>
+    <string name="pref_theme">Tema visual</string>
+    <string name="pref_unit">Unidade de velocidade</string>
+    <string name="pref_keep_screen_on">Manter tela ligada</string>
+    <string name="pref_show_accuracy">Mostrar precisão GPS</string>
+    <string name="pref_show_satellites">Mostrar número de satélites</string>
+    <string name="pref_show_altitude">Mostrar altitude</string>
+    <string name="pref_show_trip">Mostrar distância da viagem</string>
+    <string name="pref_reset_trip">Zerar viagem</string>
+
+    <string name="theme_auto">Automático (Sistema / Carro)</string>
+    <string name="theme_light">Modo Claro</string>
+    <string name="theme_dark">Modo Escuro</string>
+
+    <string name="smoothing_low">Baixa (Mais rápido)</string>
+    <string name="smoothing_medium">Média (Recomendado)</string>
+    <string name="smoothing_high">Alta (Mais estável)</string>
+
+    <string name="permission_required">Permissão de localização é necessária para o velocímetro GPS funcionar.</string>
+    <string name="grant_permission">Conceder Permissão</string>
+</resources>

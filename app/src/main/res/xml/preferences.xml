@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="@string/pref_category_speedometer"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="pref_enable_speedometer"
+            android:title="@string/pref_enable_speedometer"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:defaultValue="220"
+            android:entries="@array/max_speed_entries"
+            android:entryValues="@array/max_speed_values"
+            android:key="pref_max_speed"
+            android:title="@string/pref_max_speed"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:defaultValue="MEDIUM"
+            android:entries="@array/smoothing_entries"
+            android:entryValues="@array/smoothing_values"
+            android:key="pref_smoothing"
+            android:title="@string/pref_smoothing"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:defaultValue="AUTO"
+            android:entries="@array/theme_entries"
+            android:entryValues="@array/theme_values"
+            android:key="pref_theme"
+            android:title="@string/pref_theme"
+            app:iconSpaceReserved="false" />
+
+        <ListPreference
+            android:defaultValue="km/h"
+            android:entries="@array/unit_entries"
+            android:entryValues="@array/unit_values"
+            android:key="pref_unit"
+            android:title="@string/pref_unit"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="pref_keep_screen_on"
+            android:title="@string/pref_keep_screen_on"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Informações Secundárias"
+        app:iconSpaceReserved="false">
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="pref_show_accuracy"
+            android:title="@string/pref_show_accuracy"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="pref_show_satellites"
+            android:title="@string/pref_show_satellites"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="pref_show_altitude"
+            android:title="@string/pref_show_altitude"
+            app:iconSpaceReserved="false" />
+
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="pref_show_trip"
+            android:title="@string/pref_show_trip"
+            app:iconSpaceReserved="false" />
+
+        <Preference
+            android:key="pref_reset_trip"
+            android:title="@string/pref_reset_trip"
+            android:summary="Zera o contador de distância da viagem atual"
+            app:iconSpaceReserved="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
