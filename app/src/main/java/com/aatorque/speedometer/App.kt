@@ -4,6 +4,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import com.aatorque.speedometer.theme.ThemeRepository
 import timber.log.Timber
 
 class App : Application() {
@@ -15,6 +16,7 @@ class App : Application() {
             Timber.plant(Timber.DebugTree())
         }
 
+        ThemeRepository.init(this)
         createNotificationChannels()
     }
 

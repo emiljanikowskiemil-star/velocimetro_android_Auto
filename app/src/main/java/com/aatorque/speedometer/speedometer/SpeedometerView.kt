@@ -3,7 +3,6 @@ package com.aatorque.speedometer.speedometer
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
@@ -16,6 +15,10 @@ import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
 import com.aatorque.speedometer.R
 import com.aatorque.speedometer.gps.SpeedState
+import com.aatorque.speedometer.theme.DarkSpeedometerColors
+import com.aatorque.speedometer.theme.LightSpeedometerColors
+import com.aatorque.speedometer.theme.SpeedometerColors
+import com.aatorque.speedometer.theme.SpeedometerTheme
 
 class SpeedometerView @JvmOverloads constructor(
     context: Context,
@@ -29,6 +32,10 @@ class SpeedometerView @JvmOverloads constructor(
     private var targetSpeed: Float = 0f
     private var currentAnimatedSpeed: Float = 0f
     private var speedAnimator: ValueAnimator? = null
+
+    // Current Theme & Colors
+    private var currentTheme: SpeedometerTheme = SpeedometerTheme.DARK
+    private var currentColors: SpeedometerColors = DarkSpeedometerColors
 
     // Paints
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -83,6 +90,17 @@ class SpeedometerView @JvmOverloads constructor(
     // Theme state override: null = use system / state theme
     var isDarkModeOverride: Boolean? = null
 
+    fun setTheme(theme: SpeedometerTheme) {
+        this.currentTheme = theme
+        this.currentColors = if (theme == SpeedometerTheme.DARK) DarkSpeedometerColors else LightSpeedometerColors
+        invalidate()
+    }
+
+    fun setSpeedometerColors(colors: SpeedometerColors) {
+        this.currentColors = colors
+        invalidate()
+    }
+
     fun updateState(state: SpeedState) {
         this.speedState = state
         setSpeed(state.filteredSpeedKmh.toFloat())
@@ -108,22 +126,9 @@ class SpeedometerView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val isDark = isDarkModeOverride ?: when (speedState.themeMode) {
-            "LIGHT" -> false
-            "DARK" -> true
-            else -> {
-                val nightModeFlags = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
-                nightModeFlags == android.content.res.Configuration.UI_MODE_NIGHT_YES
-            }
-        }
+        val colors = currentColors
 
-        // Apply theme colors
-        val bgColor = ContextCompat.getColor(context, if (isDark) R.color.bg_dark else R.color.bg_light)
-        val textPrimaryColor = ContextCompat.getColor(context, if (isDark) R.color.text_primary_dark else R.color.text_primary_light)
-        val textSecondaryColor = ContextCompat.getColor(context, if (isDark) R.color.text_secondary_dark else R.color.text_secondary_light)
-        val trackColor = ContextCompat.getColor(context, if (isDark) R.color.gauge_track_dark else R.color.gauge_track_light)
-
-        canvas.drawColor(bgColor)
+        canvas.drawColor(colors.background)
 
         val widthF = width.toFloat()
         val heightF = height.toFloat()
@@ -135,7 +140,7 @@ class SpeedometerView @JvmOverloads constructor(
 
         val strokeWidth = radius * 0.08f
         trackPaint.strokeWidth = strokeWidth
-        trackPaint.color = trackColor
+        trackPaint.color = colors.inactiveTrack
 
         progressArcPaint.strokeWidth = strokeWidth
 
@@ -144,9 +149,9 @@ class SpeedometerView @JvmOverloads constructor(
             centerX - radius, centerY + radius,
             centerX + radius, centerY - radius,
             intArrayOf(
-                ContextCompat.getColor(context, R.color.gauge_arc_start),
-                ContextCompat.getColor(context, R.color.gauge_arc_mid),
-                ContextCompat.getColor(context, R.color.gauge_arc_end)
+                colors.activeArcStart,
+                colors.activeArcMid,
+                colors.activeArcEnd
             ),
             floatArrayOf(0.0f, 0.6f, 1.0f),
             Shader.TileMode.CLAMP
@@ -174,10 +179,8 @@ class SpeedometerView @JvmOverloads constructor(
         val majorStep = 20
         val totalSteps = maxSpeed / majorStep
 
-        numberPaint.color = textPrimaryColor
+        numberPaint.color = colors.primaryText
         numberPaint.textSize = radius * 0.11f
-
-        tickPaint.color = textSecondaryColor
 
         for (i in 0..totalSteps) {
             val stepSpeed = i * majorStep
@@ -186,6 +189,8 @@ class SpeedometerView @JvmOverloads constructor(
             val angleRad = Math.toRadians(angleDeg.toDouble())
 
             val isMajor = stepSpeed % 40 == 0 || stepSpeed == maxSpeed || stepSpeed == 0
+
+            tickPaint.color = if (isMajor) colors.majorTick else colors.minorTick
 
             val outerRadius = radius - (strokeWidth / 2f) - 6f
             val innerRadius = outerRadius - if (isMajor) radius * 0.09f else radius * 0.05f
@@ -207,7 +212,7 @@ class SpeedometerView @JvmOverloads constructor(
         }
 
         // 4. Draw Center Digital Speed Readout (Highest Visual Importance)
-        digitalSpeedPaint.color = textPrimaryColor
+        digitalSpeedPaint.color = colors.primaryText
         digitalSpeedPaint.textSize = radius * 0.44f
 
         val displayVal = Math.round(currentAnimatedSpeed).toInt()
@@ -215,7 +220,7 @@ class SpeedometerView @JvmOverloads constructor(
         canvas.drawText(displayVal.toString(), centerX, digitalY, digitalSpeedPaint)
 
         // 5. Draw Unit ("km/h" or "mph") below Digital Speed
-        unitTextPaint.color = ContextCompat.getColor(context, R.color.primary)
+        unitTextPaint.color = colors.activeArcStart
         unitTextPaint.textSize = radius * 0.14f
         val unitY = digitalY + radius * 0.18f
         canvas.drawText(speedState.unit, centerX, unitY, unitTextPaint)
@@ -228,18 +233,18 @@ class SpeedometerView @JvmOverloads constructor(
         val tipX = (centerX + pointerLength * Math.cos(needleAngleRad)).toFloat()
         val tipY = (centerY + pointerLength * Math.sin(needleAngleRad)).toFloat()
 
-        pointerPaint.color = ContextCompat.getColor(context, R.color.primary)
+        pointerPaint.color = colors.activeArcStart
         pointerPaint.strokeWidth = strokeWidth * 0.35f
         pointerPaint.style = Paint.Style.STROKE
         pointerPaint.strokeCap = Paint.Cap.ROUND
         canvas.drawLine(centerX, centerY, tipX, tipY, pointerPaint)
 
         // Center Pivot Circle
-        pointerCenterPaint.color = ContextCompat.getColor(context, R.color.primary)
+        pointerCenterPaint.color = colors.activeArcStart
         canvas.drawCircle(centerX, centerY, radius * 0.06f, pointerCenterPaint)
 
         // 7. Draw Secondary Information Panel at Bottom (Discreet)
-        drawSecondaryPanel(canvas, centerX, heightF - radius * 0.20f, radius, textSecondaryColor)
+        drawSecondaryPanel(canvas, centerX, heightF - radius * 0.20f, radius, colors.secondaryText)
     }
 
     private fun drawSecondaryPanel(canvas: Canvas, centerX: Float, startY: Float, radius: Float, textColor: Int) {

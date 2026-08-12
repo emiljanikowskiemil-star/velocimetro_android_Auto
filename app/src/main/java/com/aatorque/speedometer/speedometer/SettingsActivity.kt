@@ -67,8 +67,9 @@ class SettingsActivity : AppCompatActivity() {
                     SpeedRepository.updateSettings(smoothingLevel = smoothing)
                 }
                 "pref_theme" -> {
-                    val theme = sharedPreferences.getString(key, "AUTO") ?: "AUTO"
-                    SpeedRepository.updateSettings(themeMode = theme)
+                    val themeStr = sharedPreferences.getString(key, "DARK") ?: "DARK"
+                    val speedometerTheme = if (themeStr.equals("LIGHT", ignoreCase = true)) com.aatorque.speedometer.theme.SpeedometerTheme.LIGHT else com.aatorque.speedometer.theme.SpeedometerTheme.DARK
+                    com.aatorque.speedometer.theme.ThemeRepository.setTheme(requireContext().applicationContext, speedometerTheme)
                 }
                 "pref_unit" -> {
                     val unit = sharedPreferences.getString(key, "km/h") ?: "km/h"
