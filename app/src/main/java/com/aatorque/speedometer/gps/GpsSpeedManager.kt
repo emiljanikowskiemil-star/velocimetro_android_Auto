@@ -36,6 +36,7 @@ class GpsSpeedManager(private val context: Context) {
         Timber.tag("SpeedometerLocation").i("Iniciando atualizações de localização GPS GNSS")
 
         setupFusedLocation()
+        setupFallbackLocationManager()
         setupGnssStatusCallback()
         SpeedRepository.updateGpsStatus(true)
     }
@@ -64,7 +65,6 @@ class GpsSpeedManager(private val context: Context) {
             )
         } catch (e: Exception) {
             Timber.tag("SpeedometerLocation").e(e, "Erro ao solicitar localização via FusedLocationProviderClient")
-            setupFallbackLocationManager()
         }
     }
 
@@ -74,15 +74,18 @@ class GpsSpeedManager(private val context: Context) {
             processLocation(location)
         }
         try {
-            locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                100L,
-                0f,
-                legacyLocationListener!!,
-                Looper.getMainLooper()
-            )
+            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    100L,
+                    0f,
+                    legacyLocationListener!!,
+                    Looper.getMainLooper()
+                )
+                Timber.tag("SpeedometerLocation").i("LocationManager GPS_PROVIDER registrado com sucesso")
+            }
         } catch (e: Exception) {
-            Timber.tag("SpeedometerLocation").e(e, "Erro ao registrar fallback LocationManager")
+            Timber.tag("SpeedometerLocation").e(e, "Erro ao registrar LocationManager GPS_PROVIDER")
         }
     }
 
@@ -110,18 +113,23 @@ class GpsSpeedManager(private val context: Context) {
     }
 
     private fun processLocation(location: Location) {
+        val prev = lastLocation
+        if (prev != null && location.time <= prev.time && location.latitude == prev.latitude && location.longitude == prev.longitude) {
+            return
+        }
+
         val speedMps = if (location.hasSpeed()) {
             location.speed
-        } else if (lastLocation != null && location.time > lastLocation!!.time) {
-            val dist = location.distanceTo(lastLocation!!)
-            val timeSec = (location.time - lastLocation!!.time) / 1000.0
+        } else if (prev != null && location.time > prev.time) {
+            val dist = location.distanceTo(prev)
+            val timeSec = (location.time - prev.time) / 1000.0
             if (timeSec > 0) (dist / timeSec).toFloat() else 0f
         } else {
             0f
         }
 
-        val distanceDelta = if (lastLocation != null) {
-            location.distanceTo(lastLocation!!).toDouble()
+        val distanceDelta = if (prev != null) {
+            location.distanceTo(prev).toDouble()
         } else 0.0
 
         lastLocation = location

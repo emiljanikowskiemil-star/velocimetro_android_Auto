@@ -58,17 +58,25 @@ class GpsForegroundService : Service() {
 
     companion object {
         fun start(context: Context) {
-            val intent = Intent(context, GpsForegroundService::class.java)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+            try {
+                val intent = Intent(context, GpsForegroundService::class.java)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
+            } catch (e: Exception) {
+                Timber.tag("SpeedometerGPS").e(e, "Erro ao iniciar GpsForegroundService")
             }
         }
 
         fun stop(context: Context) {
-            val intent = Intent(context, GpsForegroundService::class.java)
-            context.stopService(intent)
+            try {
+                val intent = Intent(context, GpsForegroundService::class.java)
+                context.stopService(intent)
+            } catch (e: Exception) {
+                Timber.tag("SpeedometerGPS").e(e, "Erro ao parar GpsForegroundService")
+            }
         }
     }
 }

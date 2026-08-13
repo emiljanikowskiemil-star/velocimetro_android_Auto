@@ -103,7 +103,13 @@ class SpeedometerView @JvmOverloads constructor(
 
     fun updateState(state: SpeedState) {
         this.speedState = state
-        setSpeed(state.filteredSpeedKmh.toFloat())
+        val speedInUnit = if (state.unit.equals("mph", ignoreCase = true)) {
+            state.filteredSpeedKmh * 0.621371
+        } else {
+            state.filteredSpeedKmh
+        }
+        setSpeed(speedInUnit.toFloat())
+        invalidate()
     }
 
     fun setSpeed(speed: Float) {

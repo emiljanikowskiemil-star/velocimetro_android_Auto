@@ -4,6 +4,7 @@ package com.aatorque.speedometer.androidauto
 import android.os.Bundle
 import com.aatorque.speedometer.R
 import com.aatorque.speedometer.databinding.ActivityAutoSpeedometerBinding
+import com.aatorque.speedometer.gps.GpsForegroundService
 import com.aatorque.speedometer.gps.SpeedRepository
 import com.aatorque.speedometer.theme.DarkSpeedometerColors
 import com.aatorque.speedometer.theme.LightSpeedometerColors
@@ -30,6 +31,7 @@ class AutoSpeedometerActivity : CarActivity() {
         binding = ActivityAutoSpeedometerBinding.bind(findViewById(R.id.containerAutoSpeedometer))
 
         ThemeRepository.init(applicationContext)
+        GpsForegroundService.start(applicationContext)
 
         binding.btnThemeToggle.setOnClickListener {
             ThemeRepository.toggleTheme(applicationContext)
