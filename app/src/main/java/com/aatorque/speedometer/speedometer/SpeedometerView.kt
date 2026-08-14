@@ -20,6 +20,10 @@ import com.aatorque.speedometer.theme.LightSpeedometerColors
 import com.aatorque.speedometer.theme.SpeedometerColors
 import com.aatorque.speedometer.theme.SpeedometerTheme
 
+import android.annotation.SuppressLint
+import android.view.MotionEvent
+import com.aatorque.speedometer.trip.TripData
+
 class SpeedometerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -28,6 +32,9 @@ class SpeedometerView @JvmOverloads constructor(
 
     // Speed State data
     private var speedState = SpeedState()
+    private var tripData = TripData()
+
+    var onTripPanelClickListener: (() -> Unit)? = null
 
     private var targetSpeed: Float = 0f
     private var currentAnimatedSpeed: Float = 0f
@@ -109,6 +116,11 @@ class SpeedometerView @JvmOverloads constructor(
             state.filteredSpeedKmh
         }
         setSpeed(speedInUnit.toFloat())
+        invalidate()
+    }
+
+    fun updateTripData(data: TripData) {
+        this.tripData = data
         invalidate()
     }
 
@@ -254,46 +266,84 @@ class SpeedometerView @JvmOverloads constructor(
     }
 
     private fun drawSecondaryPanel(canvas: Canvas, centerX: Float, startY: Float, radius: Float, textColor: Int) {
-        secondaryInfoPaint.color = textColor
-        secondaryInfoPaint.textSize = radius * 0.095f
+        val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = currentColors.secondaryText
+            textSize = radius * 0.075f
+            textAlign = Paint.Align.CENTER
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        }
 
+        val valPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = currentColors.primaryText
+            textSize = radius * 0.10f
+            textAlign = Paint.Align.CENTER
+            typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
+        }
+
+        // Draw 2x2 grid for Trip Computer
+        val leftX = centerX - radius * 0.45f
+        val rightX = centerX + radius * 0.45f
+        val line1Y = startY - radius * 0.22f
+        val line2Y = startY - radius * 0.04f
+
+        // DISTÂNCIA & TOP SPEED
+        val distStr = String.format("%.1f km", tripData.distanceKm)
+        val maxSpeedStr = String.format("%.0f km/h", tripData.maxSpeedKmh)
+
+        canvas.drawText("DISTÂNCIA", leftX, line1Y, labelPaint)
+        canvas.drawText(distStr, leftX, line1Y + radius * 0.11f, valPaint)
+
+        canvas.drawText("TOP SPEED", rightX, line1Y, labelPaint)
+        canvas.drawText(maxSpeedStr, rightX, line1Y + radius * 0.11f, valPaint)
+
+        // TEMPO & MÉDIA
+        val timeStr = formatDuration(tripData.movingTimeMillis)
+        val avgSpeedStr = String.format("%.0f km/h", tripData.averageSpeedKmh)
+
+        canvas.drawText("TEMPO", leftX, line2Y + radius * 0.12f, labelPaint)
+        canvas.drawText(timeStr, leftX, line2Y + radius * 0.23f, valPaint)
+
+        canvas.drawText("MÉDIA", rightX, line2Y + radius * 0.12f, labelPaint)
+        canvas.drawText(avgSpeedStr, rightX, line2Y + radius * 0.23f, valPaint)
+
+        // Discrete GPS status & satellite count at bottom
         val items = mutableListOf<String>()
+        if (speedState.showSatellites) items.add("Satélites: ${speedState.satelliteCount}")
+        if (speedState.showAccuracy) items.add("Precisão: ${Math.round(speedState.accuracyMeters)}m")
+        if (speedState.showAltitude) items.add("Alt: ${Math.round(speedState.altitudeMeters)}m")
 
-        if (speedState.showSatellites) {
-            items.add("Satélites: ${speedState.satelliteCount}")
-        }
-        if (speedState.showAccuracy) {
-            items.add("Precisão: ${Math.round(speedState.accuracyMeters)}m")
-        }
-        if (speedState.showAltitude) {
-            items.add("Alt: ${Math.round(speedState.altitudeMeters)}m")
-        }
-        if (speedState.showTrip) {
-            items.add("Distância: %.1f km".format(speedState.tripDistanceKm))
-        }
-
-        val infoLine = items.joinToString("  │  ")
-        if (infoLine.isNotEmpty()) {
-            canvas.drawText(infoLine, centerX, startY, secondaryInfoPaint)
-        }
-
-        // Discrete GPS status dot
-        val gpsDotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = ContextCompat.getColor(
-                context,
-                if (speedState.isGpsActive) R.color.status_green else R.color.status_red
-            )
-        }
         val gpsLabel = if (speedState.isGpsActive) "GPS: ON" else "GPS: BUSCANDO"
-        val dotRadius = radius * 0.03f
-        val gpsY = startY + radius * 0.12f
+        val fullInfo = if (items.isNotEmpty()) "${items.joinToString(" │ ")}  │  $gpsLabel" else gpsLabel
 
-        secondaryInfoPaint.textSize = radius * 0.085f
-        val textWidth = secondaryInfoPaint.measureText(gpsLabel)
-        val dotX = centerX - (textWidth / 2f) - (dotRadius * 2.5f)
+        secondaryInfoPaint.color = textColor
+        secondaryInfoPaint.textSize = radius * 0.07f
+        val gpsY = line2Y + radius * 0.38f
+        canvas.drawText(fullInfo, centerX, gpsY, secondaryInfoPaint)
+    }
 
-        canvas.drawCircle(dotX, gpsY - (dotRadius / 2f), dotRadius, gpsDotPaint)
-        canvas.drawText(gpsLabel, centerX, gpsY, secondaryInfoPaint)
+    private fun formatDuration(millis: Long): String {
+        val totalSec = millis / 1000
+        val hours = totalSec / 3600
+        val minutes = (totalSec % 3600) / 60
+        val seconds = totalSec % 60
+        return if (hours > 0) {
+            String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        } else {
+            String.format("%02d:%02d", minutes, seconds)
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_UP) {
+            val centerY = height.toFloat() * 0.46f
+            val radius = (width.toFloat().coerceAtMost(height.toFloat()) / 2f) * 0.78f
+            if (event.y > centerY + radius * 0.2f) {
+                onTripPanelClickListener?.invoke()
+                return true
+            }
+        }
+        return super.onTouchEvent(event)
     }
 
     override fun onDetachedFromWindow() {

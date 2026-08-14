@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/containerAutoSpeedometer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,13 +8,15 @@
     <com.aatorque.speedometer.speedometer.SpeedometerView
         android:id="@+id/autoSpeedometerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutAutoTripControls" />
 
     <ImageButton
         android:id="@+id/btnThemeToggle"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_gravity="top|end"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -23,4 +25,65 @@
         android:contentDescription="Alternar Tema"
         android:src="@drawable/ic_light_mode" />
 
-</FrameLayout>
+    <LinearLayout
+        android:id="@+id/layoutAutoTripControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:background="#12161D">
+
+        <Button
+            android:id="@+id/btnAutoTripStartResume"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="▶ INICIAR VIAGEM"
+            android:textColor="#0D1117"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:backgroundTint="@color/primary"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btnAutoTripPause"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="⏸ PAUSAR"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:backgroundTint="#FF9100"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnAutoTripFinish"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="■ FINALIZAR"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:backgroundTint="#FF1744"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnAutoTripNew"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="↻ NOVA VIAGEM"
+            android:textColor="#0D1117"
+            android:textStyle="bold"
+            android:textSize="12sp"
+            android:backgroundTint="@color/primary"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</RelativeLayout>

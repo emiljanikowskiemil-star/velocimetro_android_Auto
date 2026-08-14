@@ -138,6 +138,7 @@ class GpsSpeedManager(private val context: Context) {
         val altitude = if (location.hasAltitude()) location.altitude else 0.0
 
         SpeedRepository.updateRawSpeed(
+            location = location,
             rawSpeedMetersPerSec = speedMps,
             accuracyMeters = accuracy,
             altitudeMeters = altitude,

@@ -10,6 +10,9 @@ Um velocímetro GPS moderno, minimalista e de alta legibilidade projetado para *
 ## 🌟 Funcionalidades
 
 - **Interface Gráfica Customizada**: Mostrador circular graduado de 0 a 220 km/h (configurável até 240 km/h) com indicador de velocidade digital central em alta visibilidade.
+- **Computador de Bordo**: Painel completo para monitoramento em tempo real de distância percorrida, tempo em movimento, tempo parado, velocidade média e velocidade máxima (*top speed*).
+- **Histórico de Viagens Gravadas**: Gravação automática no armazenamento interno (DataStore) ao finalizar viagens. Tela dedicada (`TripHistoryActivity`) com estatísticas acumuladas, lista de trajetos salvos e opções para exclusão individual ou limpeza do histórico.
+- **Gestão de Sessões de Viagem**: Botões para iniciar, pausar, retomar, finalizar e caixa de diálogo para recuperar viagens interrompidas involuntariamente.
 - **Integração Nativa com Android Auto**: Baseado na arquitetura de projeção do **AA Torque** (`CarActivityService` / `CarActivity`), desenhando a interface nativa em canvas direto na tela do carro.
 - **Filtro de Leitura GPS**: Filtro de Média Móvel Exponencial (EMA) para eliminar oscilações e jitter do sinal GNSS mantendo resposta imediata.
 - **Painel Secundário Discreto**: Exibição de estatísticas complementares sem competir visualmente com a velocidade:
@@ -20,6 +23,7 @@ Um velocímetro GPS moderno, minimalista e de alta legibilidade projetado para *
   - Odômetro/Distância da viagem
 - **Suporte a Temas**: Modo Claro, Modo Escuro e Modo Automático (acompanhando o sistema/carro).
 - **Gerenciador de Preferências**: Opções para alterar velocidade máxima, nível de suavização, unidades (`km/h` ou `mph`) e manter tela ligada.
+
 
 ---
 
@@ -89,6 +93,9 @@ Este projeto foi construído adaptando a infraestrutura de projeção do projeto
 - **`AutoService`**: Extende `CarActivityService` (`com.google.android.apps.auto.sdk`).
 - **`AutoSpeedometerActivity`**: Extende `CarActivity` para gerenciar a janela virtual da multimídia.
 - **`SpeedRepository`**: Canal de estado reativo unificado (`StateFlow`) fornecendo dados sincronizados para o celular e a tela do veículo.
+- **`TripManager` & `TripStorage`**: Motor do computador de bordo e gerenciador de persistência no DataStore (viagens ativas e histórico finalizado).
+- **`TripHistoryActivity`**: Interface reativa para visualização, análise estatística e exclusão de viagens salvas.
+
 
 ### Imagem real no display da multimidia lelong LE-6336 espelhamento via android auto sem fio
 

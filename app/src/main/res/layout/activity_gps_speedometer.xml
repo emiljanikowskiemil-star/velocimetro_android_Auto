@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/containerSpeedometer"
+
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_dark">
@@ -8,19 +10,101 @@
     <com.aatorque.speedometer.speedometer.SpeedometerView
         android:id="@+id/speedometerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutTripControls" />
 
-    <ImageButton
-        android:id="@+id/btnThemeToggle"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="top|end"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:contentDescription="Alternar Tema"
-        android:src="@drawable/ic_light_mode" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-</FrameLayout>
+        <ImageButton
+            android:id="@+id/btnTripHistory"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:contentDescription="Histórico de Viagens"
+            android:src="@drawable/ic_history"
+            app:tint="@color/primary" />
+
+        <ImageButton
+            android:id="@+id/btnThemeToggle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:contentDescription="Alternar Tema"
+            android:src="@drawable/ic_light_mode" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/layoutTripControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="#12161D">
+
+        <Button
+            android:id="@+id/btnTripStartResume"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:text="▶ INICIAR VIAGEM"
+            android:textColor="#0D1117"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:backgroundTint="@color/primary"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btnTripPause"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:text="⏸ PAUSAR"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:backgroundTint="#FF9100"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnTripFinish"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:text="■ FINALIZAR"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:backgroundTint="#FF1744"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnTripNew"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:text="↻ NOVA VIAGEM"
+            android:textColor="#0D1117"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:backgroundTint="@color/primary"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</RelativeLayout>

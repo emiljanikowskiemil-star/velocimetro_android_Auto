@@ -45,6 +45,13 @@
             android:exported="false"
             android:label="@string/title_activity_settings" />
 
+        <!-- Trip History Activity -->
+        <activity
+            android:name=".trip.TripHistoryActivity"
+            android:exported="false"
+            android:label="Histórico de Viagens" />
+
+
         <!-- Android Auto Projection Service -->
         <service
             android:name=".androidauto.AutoService"

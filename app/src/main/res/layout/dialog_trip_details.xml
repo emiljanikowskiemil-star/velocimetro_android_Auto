@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_bottom_sheet">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="VIAGEM ATUAL"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/primary"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#30363D"
+        android:layout_marginBottom="16dp" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:rowCount="3"
+        android:useDefaultMargins="true"
+        android:alignmentMode="alignBounds">
+
+        <!-- Distância -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@drawable/bg_trip_metric_card"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DISTÂNCIA"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary_dark"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDetailDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0,0 km"
+                android:textSize="18sp"
+                android:textColor="@color/text_primary_dark"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Velocidade Máxima -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@drawable/bg_trip_metric_card"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VELOCIDADE MÁXIMA"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary_dark"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDetailMaxSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 km/h"
+                android:textSize="18sp"
+                android:textColor="@color/text_primary_dark"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Velocidade Média -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@drawable/bg_trip_metric_card"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VELOCIDADE MÉDIA"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary_dark"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDetailAvgSpeed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 km/h"
+                android:textSize="18sp"
+                android:textColor="@color/text_primary_dark"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Tempo Total -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@drawable/bg_trip_metric_card"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TEMPO TOTAL"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary_dark"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDetailTotalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00"
+                android:textSize="18sp"
+                android:textColor="@color/text_primary_dark"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Em Movimento -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@drawable/bg_trip_metric_card"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EM MOVIMENTO"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary_dark"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDetailMovingTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00"
+                android:textSize="18sp"
+                android:textColor="@color/text_primary_dark"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- Parado -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:background="@drawable/bg_trip_metric_card"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PARADO"
+                android:textSize="11sp"
+                android:textColor="@color/text_secondary_dark"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDetailStoppedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00"
+                android:textSize="18sp"
+                android:textColor="@color/text_primary_dark"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </GridLayout>
+
+    <!-- Estado -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="12dp"
+        android:background="@drawable/bg_trip_metric_card"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ESTADO DA SESSÃO"
+            android:textSize="11sp"
+            android:textColor="@color/text_secondary_dark"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDetailState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NÃO INICIADA"
+            android:textSize="14sp"
+            android:textColor="@color/primary"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOpenHistory"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="📊 VER HISTÓRICO COMPLETO"
+        android:textColor="@color/primary"
+        android:textStyle="bold"
+        app:strokeColor="@color/primary"
+        app:strokeWidth="1dp" />
+
+    <Button
+        android:id="@+id/btnCloseDetail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FECHAR"
+        android:textColor="#0D1117"
+        android:backgroundTint="@color/primary"
+        android:textStyle="bold" />
+</LinearLayout>
+

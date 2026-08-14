@@ -1,10 +1,12 @@
 package com.aatorque.speedometer.gps
 
+import com.aatorque.speedometer.trip.TripManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
+import android.location.Location
 
 object SpeedRepository {
 
@@ -14,6 +16,7 @@ object SpeedRepository {
     private val speedFilter = SpeedFilter()
 
     fun updateRawSpeed(
+        location: Location? = null,
         rawSpeedMetersPerSec: Float,
         accuracyMeters: Float,
         altitudeMeters: Double,
@@ -42,6 +45,14 @@ object SpeedRepository {
                 altitudeMeters = altitudeMeters,
                 tripDistanceKm = current.tripDistanceKm + deltaKm,
                 isGpsActive = true
+            )
+        }
+
+        if (location != null) {
+            TripManager.processLocation(
+                location = location,
+                filteredSpeedKmh = filteredKmh,
+                accuracyMeters = accuracyMeters
             )
         }
 

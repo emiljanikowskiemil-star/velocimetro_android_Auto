@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+import com.aatorque.speedometer.trip.TripHistoryActivity
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -54,12 +56,17 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, GpsSpeedometerActivity::class.java))
         }
 
+        binding.cardHistory.setOnClickListener {
+            startActivity(Intent(this, TripHistoryActivity::class.java))
+        }
+
         binding.cardSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         observeSpeedState()
     }
+
 
     private fun checkAndRequestPermissions() {
         val permissions = mutableListOf(
