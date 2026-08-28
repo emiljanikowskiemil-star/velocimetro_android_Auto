@@ -49,8 +49,8 @@ object TripManager {
                         state = pendingSession.state,
                         distanceMeters = pendingSession.distanceMeters,
                         maxSpeedKmh = pendingSession.maxSpeedKmh,
-                        averageSpeedKmh = calculateMovingAverage(pendingSession.distanceMeters, pendingSession.movingTimeMillis),
-                        totalAverageSpeedKmh = calculateTotalAverage(pendingSession.distanceMeters, pendingSession.movingTimeMillis + pendingSession.stoppedTimeMillis),
+                        averageSpeedKmh = calculateMovingAverage(pendingSession.distanceMeters, pendingSession.movingTimeMillis, pendingSession.maxSpeedKmh),
+                        totalAverageSpeedKmh = calculateTotalAverage(pendingSession.distanceMeters, pendingSession.movingTimeMillis + pendingSession.stoppedTimeMillis, pendingSession.maxSpeedKmh),
                         elapsedTimeMillis = pendingSession.movingTimeMillis + pendingSession.stoppedTimeMillis,
                         movingTimeMillis = pendingSession.movingTimeMillis,
                         stoppedTimeMillis = pendingSession.stoppedTimeMillis,
@@ -249,8 +249,8 @@ object TripManager {
         )
         currentSession = updated
 
-        val movingAverage = calculateMovingAverage(newDistanceMeters, updated.movingTimeMillis)
-        val totalAverage = calculateTotalAverage(newDistanceMeters, updated.movingTimeMillis + updated.stoppedTimeMillis)
+        val movingAverage = calculateMovingAverage(newDistanceMeters, updated.movingTimeMillis, updated.maxSpeedKmh)
+        val totalAverage = calculateTotalAverage(newDistanceMeters, updated.movingTimeMillis + updated.stoppedTimeMillis, updated.maxSpeedKmh)
 
         _tripData.update { current ->
             current.copy(
@@ -289,8 +289,8 @@ object TripManager {
                 )
                 currentSession = updatedSession
 
-                val movingAverage = calculateMovingAverage(updatedSession.distanceMeters, newMovingTime)
-                val totalAverage = calculateTotalAverage(updatedSession.distanceMeters, totalElapsed)
+                val movingAverage = calculateMovingAverage(updatedSession.distanceMeters, newMovingTime, updatedSession.maxSpeedKmh)
+                val totalAverage = calculateTotalAverage(updatedSession.distanceMeters, totalElapsed, updatedSession.maxSpeedKmh)
 
                 _tripData.update { current ->
                     current.copy(
@@ -316,18 +316,20 @@ object TripManager {
         }
     }
 
-    private fun calculateMovingAverage(distanceMeters: Double, movingTimeMillis: Long): Float {
+    private fun calculateMovingAverage(distanceMeters: Double, movingTimeMillis: Long, maxSpeedKmh: Float = 0f): Float {
         if (movingTimeMillis <= 0) return 0f
         val movingTimeHours = movingTimeMillis / 3_600_000.0
         val distanceKm = distanceMeters / 1000.0
-        return (distanceKm / movingTimeHours).toFloat().coerceAtLeast(0f)
+        val calculatedAvg = (distanceKm / movingTimeHours).toFloat().coerceAtLeast(0f)
+        return if (maxSpeedKmh > 0f) minOf(calculatedAvg, maxSpeedKmh) else calculatedAvg
     }
 
-    private fun calculateTotalAverage(distanceMeters: Double, totalTimeMillis: Long): Float {
+    private fun calculateTotalAverage(distanceMeters: Double, totalTimeMillis: Long, maxSpeedKmh: Float = 0f): Float {
         if (totalTimeMillis <= 0) return 0f
         val totalTimeHours = totalTimeMillis / 3_600_000.0
         val distanceKm = distanceMeters / 1000.0
-        return (distanceKm / totalTimeHours).toFloat().coerceAtLeast(0f)
+        val calculatedAvg = (distanceKm / totalTimeHours).toFloat().coerceAtLeast(0f)
+        return if (maxSpeedKmh > 0f) minOf(calculatedAvg, maxSpeedKmh) else calculatedAvg
     }
 
     suspend fun loadTripHistory(): List<FinishedTrip> {

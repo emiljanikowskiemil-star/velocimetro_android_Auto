@@ -50,4 +50,20 @@ class FinishedTripTest {
 
         assertEquals(900_000L, trip.totalDurationMillis)
     }
+
+    @Test
+    fun testAverageSpeedCappedByMaxSpeed() {
+        val trip = FinishedTrip(
+            id = "test-4",
+            startTime = 1000L,
+            endTime = 5000L,
+            distanceMeters = 1518200.0, // 1518.2 km
+            maxSpeedKmh = 114f,
+            movingTimeMillis = 28543000L, // ~7h55m (191 km/h calc)
+            stoppedTimeMillis = 0L
+        )
+
+        // Calculated average is ~191 km/h, but max speed is 114 km/h so average must be capped at 114 km/h
+        assertEquals(114.0f, trip.averageSpeedKmh, 0.01f)
+    }
 }

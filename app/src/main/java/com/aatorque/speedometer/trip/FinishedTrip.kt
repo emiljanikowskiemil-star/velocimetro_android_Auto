@@ -16,7 +16,8 @@ data class FinishedTrip(
         get() {
             if (movingTimeMillis <= 0) return 0f
             val movingHours = movingTimeMillis / 3_600_000.0
-            return (distanceKm / movingHours).toFloat().coerceAtLeast(0f)
+            val calculatedAvg = (distanceKm / movingHours).toFloat().coerceAtLeast(0f)
+            return if (maxSpeedKmh > 0f) minOf(calculatedAvg, maxSpeedKmh) else calculatedAvg
         }
 
     val totalDurationMillis: Long
