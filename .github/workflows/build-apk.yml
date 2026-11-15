@@ -1,6 +1,4 @@
 
-    
-  
 name: Build Velocimetro APK
 
 on:
@@ -16,6 +14,7 @@ jobs:
   build:
     name: Build debug APK
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -27,7 +26,9 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
 
       - name: Install Android SDK 34
         run: |
@@ -61,4 +62,3 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
-
