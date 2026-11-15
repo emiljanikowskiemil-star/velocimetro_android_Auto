@@ -1,0 +1,64 @@
+
+    
+  
+name: Build Velocimetro APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 34
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
+
+      - name: Resolve Android Auto SDK dependency
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('app/build.gradle')
+          text = path.read_text(encoding='utf-8')
+          old = "implementation files('libs/aauto.aar')"
+          new = "implementation 'com.github.martoreto:aauto-sdk:v4.0'"
+          if old not in text:
+              raise SystemExit('Expected local aauto.aar dependency not found; source layout has changed.')
+          path.write_text(text.replace(old, new), encoding='utf-8')
+          print('Replaced missing local aauto.aar with the JitPack aauto-sdk:v4.0 dependency.')
+          PY
+
+      - name: Build APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: velocimetro-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
