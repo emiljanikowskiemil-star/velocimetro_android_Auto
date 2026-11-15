@@ -40,19 +40,83 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+
           path = Path('app/build.gradle')
-          text = path.read_text(encoding='utf-8')
+          content = path.read_text(encoding='utf-8')
+
           old = "implementation files('libs/aauto.aar')"
           new = "implementation 'com.github.martoreto:aauto-sdk:v4.0'"
-          if old not in text:
-              raise SystemExit('Expected local aauto.aar dependency not found; source layout has changed.')
-          path.write_text(text.replace(old, new), encoding='utf-8')
-          print('Replaced missing local aauto.aar with the JitPack aauto-sdk:v4.0 dependency.')
+
+          if old not in content:
+              raise SystemExit(
+                  'Expected local aauto.aar dependency not found.'
+              )
+
+          path.write_text(
+              content.replace(old, new),
+              encoding='utf-8'
+          )
+
+          print('Android Auto SDK dependency configured.')
+          PY
+
+      - name: Prepare legacy SDK resources
+        shell: bash
+        run: |
+          chmod +x ./gradlew
+
+          set +e
+          ./gradlew --no-daemon :app:mergeDebugResources
+          RESULT=$?
+          set -e
+
+          echo "Initial resource processing finished with code: $RESULT"
+          echo "Preparing legacy SDK resource correction."
+
+      - name: Fix legacy Android Auto ID resources
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          cache = Path.home() / ".gradle" / "caches"
+
+          files = [
+              p for p in cache.rglob("ids.xml")
+              if "jetified-aauto-sdk-v4.0" in str(p)
+              and "transforms-" in str(p)
+          ]
+
+          if not files:
+              raise SystemExit(
+                  "Nie znaleziono przetworzonego ids.xml biblioteki Android Auto."
+              )
+
+          for file in files:
+              tree = ET.parse(file)
+              root = tree.getroot()
+              fixed = 0
+
+              for item in root.findall("item"):
+                  if item.get("type") == "id":
+                      item.clear()
+                      item.set("type", "id")
+                      item.set("name", item.get("name") or "")
+                      fixed += 1
+
+              tree.write(
+                  file,
+                  encoding="utf-8",
+                  xml_declaration=True
+              )
+
+              print(f"Poprawiono {fixed} wpisów: {file}")
+
           PY
 
       - name: Build APK
         run: |
-          chmod +x ./gradlew
           ./gradlew --no-daemon assembleDebug
 
       - name: Upload APK artifact
