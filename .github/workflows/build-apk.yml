@@ -1,128 +1,56 @@
 
-name: Build Velocimetro APK
+    
+  
+          try:
+              with zipfile.ZipFile(source, 'r') as zin, zipfile.ZipFile(temp, 'w', zipfile.ZIP_DEFLATED) as zout:
+                  for info in zin.infolist():
+                      data = zin.read(info.filename)
+                      if info.filename.endswith('/values/ids.xml') or info.filename == 'res/values/ids.xml':
+                          root = ET.fromstring(data)
+                          changed = 0
+                          for item in root.iter('item'):
+                              if item.get('type') == 'id':
+                                  for child in list(item):
+                                      item.remove(child)
+                                  item.text = None
+                                  changed += 1
+                          if changed:
+                              data = ET.tostring(root, encoding='utf-8', xml_declaration=True)
+                              patched_files += 1
+                              patched_items += changed
+                      zout.writestr(info, data)
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+              if patched_files == 0 or patched_items == 0:
+                  raise SystemExit('Nie znaleziono wadliwych wpisów ID w AAR; przerywam, aby nie budować z niezmienioną biblioteką.')
 
-permissions:
-  contents: read
-
-jobs:
-  build:
-    name: Build debug APK
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v4
-        with:
-          packages: 'platform-tools'
-
-      - name: Install Android SDK 34
-        run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
-
-      - name: Resolve Android Auto SDK dependency
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          path = Path('app/build.gradle')
-          content = path.read_text(encoding='utf-8')
-
-          old = "implementation files('libs/aauto.aar')"
-          new = "implementation 'com.github.martoreto:aauto-sdk:v4.0'"
-
-          if old not in content:
-              if new in content:
-                  print('Android Auto SDK dependency already configured.')
-              else:
-                  raise SystemExit(
-                      'Expected Android Auto SDK dependency not found.'
-                  )
-          else:
-              path.write_text(
-                  content.replace(old, new),
-                  encoding='utf-8'
-              )
-              print('Android Auto SDK dependency configured.')
+              target.parent.mkdir(parents=True, exist_ok=True)
+              temp.replace(target)
+              print(f'Naprawiono {patched_items} wpisów ID w {patched_files} pliku(ach).')
+          finally:
+              if temp.exists():
+                  temp.unlink()
           PY
 
-      - name: Prepare legacy SDK resources
-        shell: bash
-        run: |
-          chmod +x ./gradlew
+          unzip -t app/libs/aauto-sdk-fixed.aar
 
-          set +e
-          ./gradlew --no-daemon :app:mergeDebugResources
-          RESULT=$?
-          set -e
-
-          echo "Initial resource processing finished with code: $RESULT"
-
-      - name: Fix legacy Android Auto ID resources
-        shell: bash
-        run: |
           python3 - <<'PY'
           from pathlib import Path
-          import xml.etree.ElementTree as ET
-
-          cache = Path.home() / ".gradle" / "caches"
-
-          files = [
-              p for p in cache.rglob("ids.xml")
-              if "jetified-aauto-sdk-v4.0" in str(p)
-              and "transforms-" in str(p)
-          ]
-
-          if not files:
-              raise SystemExit(
-                  "Nie znaleziono ids.xml biblioteki Android Auto."
-              )
-
-          total = 0
-
-          for file in files:
-              tree = ET.parse(file)
-              root = tree.getroot()
-              fixed = 0
-
-              for item in root.findall("item"):
-                  if item.get("type") == "id":
-                      for child in list(item):
-                          item.remove(child)
-                      item.text = None
-                      fixed += 1
-
-              tree.write(
-                  file,
-                  encoding="utf-8",
-                  xml_declaration=True
-              )
-
-              total += fixed
-              print(f"Poprawiono {fixed} wpisów: {file}")
-
-          if total == 0:
-              print("Nie znaleziono wpisów wymagających poprawy.")
+          path = Path('app/build.gradle')
+          content = path.read_text(encoding='utf-8')
+          old = "implementation files('libs/aauto.aar')"
+          new = "implementation files('libs/aauto-sdk-fixed.aar')"
+          if old in content:
+              path.write_text(content.replace(old, new), encoding='utf-8')
+              print('Ustawiono zależność na naprawiony lokalny plik AAR.')
+          elif new in content:
+              print('Zależność na naprawiony AAR jest już ustawiona.')
+          else:
+              raise SystemExit('Nie znaleziono oczekiwanej zależności aauto.aar w app/build.gradle.')
           PY
 
       - name: Build APK
         run: |
+          chmod +x ./gradlew
           ./gradlew --no-daemon clean assembleDebug
 
       - name: Upload APK artifact
@@ -132,3 +60,4 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14
+
